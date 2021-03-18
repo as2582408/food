@@ -44,16 +44,16 @@
     <table class="table">
         <thead>
           <tr>
+            <th scope="col">新增店家人員</th>
             <th scope="col">餐廳名稱</th>
-            <th scope="col">編輯</th>
             <th scope="col">開啟新訂單</th>
           </tr>
         </thead>
         <tbody>
             @foreach ($shop as $item)
             <tr >
-                <th scope="col">{{$item->shop_name}}</th>
-                <th scope="col">編輯</th>
+                <th scope="col">{{$item->add_user}}</th>
+                <td><a href='{{ url("shopContent/{$item->id}") }}' class="alert-link">{{$item->shop_name}}</a></td>
                 <td><a href='{{ url("newDetail/{$item->id}") }}' class="alert-link">新訂單</a></td>
             </tr>
             @endforeach

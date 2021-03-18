@@ -11,6 +11,6 @@ class Shop extends Model
     protected $table = 'shop';
 
     protected $fillable = [
-        'shop_name'
+        'shop_name','add_user'
     ];
 }

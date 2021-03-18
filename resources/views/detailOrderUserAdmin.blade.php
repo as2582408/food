@@ -31,6 +31,7 @@
                   <li class="breadcrumb-item"><a href="{{ url('/') }}">開放中訂單</a></li>
                   <li class="breadcrumb-item"><a href="{{ url('shop') }}">店家</a></li>
                   <li class="breadcrumb-item"><a href="{{ url('history') }}">歷史訂單</a></li>
+
                 </ol>
             </nav>
         </div>
@@ -55,27 +56,21 @@
               <li class="breadcrumb-item"><a href="{{ url("detailOrderUserAdmin/{$id}") }}">訂購人排序</a></li>
             </ol>
         </div>
-
         <tr>
-            <th scope="col">商品名</th>
-            <th scope="col">價格</th>
-            <th scope="col">訂購者</th>
-            <th scope="col">數量</th>
-            <th scope="col">備註</th>
-            <th scope="col">編輯</th>
-            <th scope="col">刪除</th>
+            <th scope="col">訂購人</th>
+            <th scope="col">總價</th>
+            <th scope="col">商品</th>
         </tr>
         </thead>
         <tbody>
-            @foreach ($orders as  $order)
+            @foreach ($users as $user_name => $products)
             <tr>
-                <th scope="row">{{$order->product_name}}</th>
-                <td>{{$order->product_price}}</td>
-                <td>{{$order->user}}</td>
-                <td>{{$order->amount}}</td>
-                <td>{{$order->ps}}</td>
-                <td><a href='{{ url("editOrder/{$order->id}") }}' class="alert-link">編輯</a></td>
-                <td><a href='{{ url("del/{$order->id}") }}' class="alert-link">刪除</a></td>
+                <th scope="row">{{$user_name}}</th>
+                <th scope="row">{{'$'.$price[$user_name]}}</th>
+
+                @foreach ($products as $product)
+                    <td>{{$product->product_name}}{{' x '.$product->amount}}</td>
+                @endforeach
             </tr>
             @endforeach
     </tbody>

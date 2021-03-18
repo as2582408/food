@@ -16,7 +16,7 @@ class CreateShopTable extends Migration
         Schema::create('shop', function (Blueprint $table) {
             $table->increments('id');
             $table->string('shop_name', 30);
-            
+            $table->string('addUser', 30);
         });
     }
 

@@ -31,43 +31,30 @@
                   <li class="breadcrumb-item"><a href="{{ url('/') }}">開放中訂單</a></li>
                   <li class="breadcrumb-item"><a href="{{ url('shop') }}">店家</a></li>
                   <li class="breadcrumb-item"><a href="{{ url('history') }}">歷史訂單</a></li>
+
                 </ol>
             </nav>
         </div>
     </div>
-    <form method="POST" action="{{ url('add') }}" class="form-horizontal" role="form">
-
-    <table>
-          <tr>
-            {!! csrf_field() !!}
-              <td id="items">
-              新增人員<input id="addUser" name="addUser" required="">
-                <br><br>
-              商店名<input id="shop" name="shop" required="">
-                <br><br>
-              1.   
-              <input id="items1" name="items[]" required="">
-              價格<input id="price1" name="price[]" required="">
-              <br><br>
-              2.   
-              <input id="items2" name="items[]" required="">
-              價格<input id="price2" name="price[]" required="">
-              <br>   
-              </td>
-              <input id="add_items" name="add_items" type="button"  class="bt-add" value="新增商品欄位" style="margin-top:10px">
-              <input id="add" name="add" type="submit"  value="確認"  >
-          </tr>
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th scope="col">商品名</th>
+            <th scope="col">價格</th>
+        </tr>
+        </thead>
+        <tbody>
+            @foreach ($products as $product)
+            <tr>
+                <th scope="row">{{$product->product_name}}</th>
+                <th scope="row">{{'$'.$product->product_price}}</th>
+            </tr>
+            @endforeach
+    </tbody>
     </table>
-</form>
-  </div>
-<script>
-  	var i = 2;
-
-    $('#add_items').click(function(){
-    var o = '價格'
-		$items = $('#price'+i);
-		i++;
-		$items.after('<br><br>'+i+'.    <input id="items' + i + '" name="items[]" ' + 'required="" >'+o+'<input id="price' + i + '" name="price[]" ' + 'required="" >');
-	})
+</div>
+<script> 
+        var shop = [];
+        $items = $('#start');
+        $items.after('<tr id="start"> <th scope=row>1</th> <td>Mark</td> <td>Otto</td> </tr>');
 </script>
-

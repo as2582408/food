@@ -37,21 +37,41 @@
         <table class="table">
             <thead>
               <tr>
+                <th scope="col">發起人</th>
                 <th scope="col">餐廳名稱</th>
                 <th scope="col">結束時間</th>
                 <th scope="col">管理</th>
               </tr>
             </thead>
             <tbody>
-                @foreach ($shop as $name)
-                <tr >
-                    <td><a href='{{ url("detailOrder/{$name->id}") }}' class="alert-link">{{$name->shop_name}}</a></td>
-                    <td>{{$name->end_time}}</td>
-                    <td><a href='{{ url("detailEditPassword/{$name->id}") }}' class="alert-link">管理</a></td>
-                </tr>
-                @endforeach
+              <tr id = 'tr'>
+              </tr>
             </tbody>
           </table>
         </div>
     </div>
+    <script> 
+      $.ajax({
+      url: "/food/public/hisAllDetail",
+      type: "GET",
+      dataType: "text",
+      cache: false,
+      success: function(response) {
+          var arr = JSON.parse(response);
+          var forEachIt = arr.forEach(function(item, index, array){
+              console.log(item);
 
+              $tr = $('#tr');
+              var oao = '<tr><td>'+item.openUser+'</td>'
+              oao += '<td><a href="{{ url("detailOrder") }}/'+item.id+'">'+item.shop_name+'</a></td>';
+              oao += '<td>'+item.end_time+'</td>'
+              oao += '<td><a href="{{ url("order") }}/'+item.id+'/'+item.shopId+'"class="alert-link">訂購</a></td>';
+              oao += '<td><a href="{{ url("detailEditPassword") }}/'+item.id+'"class="alert-link">管理</a></td></tr>';
+              $tr.after(oao);
+          });
+      },
+      error: function(){
+          console.log('哪裡怪怪的');
+          } 
+  });
+  </script>

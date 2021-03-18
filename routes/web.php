@@ -14,6 +14,7 @@
 Route::get('/', 'ShopController@Index');
 
 Route::get('/shop', 'ShopController@shopIndex');
+Route::get('/shopContent/{id}', 'ShopController@shopContent');
 
 Route::get('/addShop', 'ShopController@addShop');
 Route::post('/add', 'ShopController@postAddShop');
@@ -26,8 +27,13 @@ Route::post('/detailEditPage', 'ShopController@detailEditPage');
 Route::get('/detailEditPage/{id}', 'ShopController@getDetailEditPage');
 //編輯
 Route::post('/detailEdit', 'ShopController@detailEdit');
+Route::get('/del/{id}', 'ShopController@delOrder');
+
 //管理員訂單查看
 Route::get('/detailOrderAdmin/{id}', 'ShopController@detailOrderAdmin');
+Route::get('/detailOrderUserAdmin/{id}', 'ShopController@detailOrderUserAdmin');
+Route::get('/detailOrderAdminList/{id}', 'ShopController@detailOrderAdminList');
+
 //管理員詳細訂單
 Route::get('/editOrder/{id}', 'ShopController@editOrderPage');
 //編輯使用者訂單
@@ -52,6 +58,8 @@ Route::get('/allOrder/{id}', 'ShopController@allOrder');
 Route::get('/getOrderStatus/{id}', 'ShopController@getOrderStatus');
 Route::get('/changOrderStatus/{id}/{status}', 'ShopController@changOrderStatus');
 Route::get('/allDetail', 'ShopController@allDetail');
+Route::get('/hisAllDetail', 'ShopController@hisAllDetail');
+
 
 
 
