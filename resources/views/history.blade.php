@@ -29,8 +29,8 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="{{ url('/') }}">開放中訂單</a></li>
-                  <li class="breadcrumb-item"><a href="{{ url('shop') }}">店家</a></li>
                   <li class="breadcrumb-item"><a href="{{ url('history') }}">歷史訂單</a></li>
+                  <li class="breadcrumb-item"><a href="{{ url('shop') }}">店家</a></li>
                 </ol>
             </nav>
         </div>

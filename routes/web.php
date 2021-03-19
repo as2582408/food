@@ -62,7 +62,7 @@ Route::get('/allOrder/{id}', 'ShopController@allOrder');
 
 
 Route::get('/getOrderStatus/{id}', 'ShopController@getOrderStatus');
-Route::get('/changOrderStatus/{id}/{status}', 'ShopController@changOrderStatus');
+Route::get('/changOrderStatus/{id}', 'ShopController@changOrderStatus');
 Route::get('/allDetail', 'ShopController@allDetail');
 Route::get('/hisAllDetail', 'ShopController@hisAllDetail');
 Route::get('/allOrderAjax/{id}', 'ShopController@allOrderAjax');

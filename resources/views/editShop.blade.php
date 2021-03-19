@@ -29,8 +29,8 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="{{ url('/') }}">開放中訂單</a></li>
-                  <li class="breadcrumb-item"><a href="{{ url('shop') }}">店家</a></li>
                   <li class="breadcrumb-item"><a href="{{ url('history') }}">歷史訂單</a></li>
+                  <li class="breadcrumb-item"><a href="{{ url('shop') }}">店家</a></li>
                   <li class="breadcrumb-item">{{$shopName->shop_name}}</li>
                 </ol>
             </nav>
@@ -46,7 +46,7 @@
           <div id="div1">
           1.   
           <input id="items1" name="items[]" required="">
-          價格<input id="price1" name="price[]" required="">
+          價格<input id="price1" name="price[]" type="number" min="0" max="10000000" required="">
           <br>
           </div>
           </td>
@@ -87,7 +87,7 @@
         $items = $('#div');
       }
 		i++;
-		$items.after('<div id="div'+i+'"><br>'+i+'.    <input id="items' + i + '" name="items[]" ' + ' required="" >'+o+'<input id="price' + i + '" name="price[]" ' + ' required="" ></div>');
+		$items.after('<div id="div'+i+'"><br>'+i+'.    <input id="items' + i + '" name="items[]" ' + ' required="" >'+o+'<input id="price' + i + '" name="price[]" ' + ' type="number" min="0" max="10000000" required="" ></div>');
 	})
   
   $('#delitems').click(function(){

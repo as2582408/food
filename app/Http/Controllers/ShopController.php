@@ -43,7 +43,7 @@ class ShopController extends Controller
         };
         //檢查商店名稱
         $this->validate($request, [
-            'shop' => 'required|max:255|regex:/^[A-Za-z0-9\x7f-\xffA]+$/',
+            'shop' => 'required|max:255|unique:shop,shop_name|regex:/^[A-Za-z0-9\x7f-\xffA]+$/',
             'addUser' => 'required|max:255|regex:/^[A-Za-z0-9\x7f-\xffA]+$/',
         ]);
         //檢查商品
@@ -64,6 +64,10 @@ class ShopController extends Controller
             if(!isset($item) || !is_numeric($priceCheck)){
                 return redirect('/shop')->withErrors('價格格式錯誤，請輸入數字');
             }
+        }
+        $check = Shop::where('shop_name', $request->shop)->first();
+        if (isset($check)) {
+            return redirect('/shop')->withErrors('商店已存在');
         }
 
         $shopId = Shop::insertGetId(['shop_name' => $request->shop, 'add_user' => $request->addUser]);
@@ -455,11 +459,15 @@ class ShopController extends Controller
         return $orders->toJson();
     }
 
-    public function changOrderStatus($id,$status) 
+    public function changOrderStatus($id) 
     {   
-        $status = ($status == 'N') ? 'Y' : 'N'; 
-        $orders = Order::where('id', $id)->update(['status' => $status]);
-        return $orders;
+        if(!is_numeric($id)) {
+            return false;
+        }
+        $orderStatus = Order::select('status')->where('id', $id)->first();
+        $status = ($orderStatus->status == 'N') ? 'Y' : 'N'; 
+        Order::where('id', $id)->update(['status' => $status]);
+        return $status;
     }
 
     public function allDetail() 

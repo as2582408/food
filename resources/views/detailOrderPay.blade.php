@@ -29,8 +29,8 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="{{ url('/') }}">開放中訂單</a></li>
-                  <li class="breadcrumb-item"><a href="{{ url('shop') }}">店家</a></li>
                   <li class="breadcrumb-item"><a href="{{ url('history') }}">歷史訂單</a></li>
+                  <li class="breadcrumb-item"><a href="{{ url('shop') }}">店家</a></li>
                   <li class="breadcrumb-item">{{$shopName->shop_name}}</li>
                 </ol>
             </nav>
@@ -59,7 +59,7 @@
         <tbody>
             @foreach ($orders as  $order)
             <tr>
-                <th scope="row" id={{$order->id}} onclick="chang('{{$order->id}}','{{$order->status}}')">{{$order->product_name}}</th>
+                <th scope="row" id={{$order->id}} onclick="chang('{{$order->id}}')">{{$order->product_name}}</th>
                 <td id = 'price{{$order->id}}'>{{$order->product_price}}</td>
                 <td>{{$order->user}}</td>
                 <td id = 'amount{{$order->id}}'>{{$order->amount}}</td>
@@ -90,7 +90,7 @@
                     if(item.status == 'Y') {
                         var color = 'red';
                     } else {
-                        var color = 'green';
+                        var color = '#00BB00';
                     }
                     if(item.status == 'Y') {
                         noPay += (item.product_price * item.amount);
@@ -107,35 +107,33 @@
         	    } 
         });
 
-        function chang(id,status){
+        function chang(id){
             var oldNoPay = document.getElementById('noPay').innerHTML
             var oldPay = document.getElementById('Pay').innerHTML
             var price =  document.getElementById('price'+id).innerHTML
             var amount =  document.getElementById('amount'+id).innerHTML
         $.ajax({
-            url: "/changOrderStatus/"+id+'/'+status,
+            url: "/changOrderStatus/"+id,
             type: "GET",
             dataType: "text",
             cache: false,
             success: function(response) {
-                if(status == 'Y') {
-                        var color = 'green';
+                console.log(response);
+                if(response == 'N') {
+                        var color = '#00BB00';
                     } else {
                         var color = 'red';
                 }
                 document.getElementById(id).style['background-color'] = color;
-                if(status == 'Y') {
+                if(response == 'N') {
                         oldNoPay = (oldNoPay - (price * amount));
                         oldPay = parseInt(oldPay) + parseInt(price * amount);
-                        console.log(oldPay,oldNoPay);
-                        console.log(document.getElementById('21'));
                         document.getElementById('noPay').innerHTML = oldNoPay;
                         document.getElementById('Pay').innerHTML = oldPay;
-                    } else {
+                } 
+                if (response == 'Y') {
                         oldNoPay = parseInt(oldNoPay) + parseInt(price * amount);
                         oldPay = (oldPay - (price * amount));
-                        console.log(oldPay,oldNoPay);
-
                         document.getElementById('noPay').innerHTML = oldNoPay;
                         document.getElementById('Pay').innerHTML = oldPay;
                 }
