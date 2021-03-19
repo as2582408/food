@@ -48,10 +48,16 @@ class ShopController extends Controller
         ]);
         //檢查商品
         $itemPattern = "/^[A-Za-z0-9\x7f-\xffA]+$/";
+        $i = $itemsNum;
+        $j = 1;
         foreach($request->items as $item) {
             if(!isset($item) || !preg_match($itemPattern, $item, $matches)){
                 return redirect('/shop')->withErrors('商品格式錯誤，請勿輸入特殊符號');
             }
+            if($j != $i && $request->items[$j] == $item){
+                return redirect('/shop')->withErrors('請勿輸入重複商品');
+            }
+            $j++;
         }
         //檢查價格
         foreach($request->price as $priceCheck) {
@@ -82,7 +88,7 @@ class ShopController extends Controller
             return redirect('/');
         };
        
-        return view('newDetail',['id' => $id]);
+        return view('newDetail',['id' => $id, 'shopName' => $shop]);
     }
     public function newDetail(Request $request)
     {
@@ -116,8 +122,9 @@ class ShopController extends Controller
         if( !is_numeric($id) || !is_numeric($shopId)) {
             return redirect('/');
         }
+        $shop = Shop::find($shopId);
         $products = Product::where('shop_id',$shopId)->get();
-        return view('order',['products' => $products, 'detailId' => $id]);
+        return view('order',['products' => $products, 'detailId' => $id, 'shopName' => $shop]);
     }
 
     public function addOrder(Request $request) 
@@ -169,6 +176,8 @@ class ShopController extends Controller
         ',[$id]);
         $shopid = Detail::find($id);
         $product = Product::where('shop_id',$shopid->shop_id)->get();
+        $shop = Shop::find($shopid->shop_id);
+
         $newOrder = [];
         //將訂單依商品分類
         foreach($orders as $order)
@@ -183,7 +192,7 @@ class ShopController extends Controller
             $key = $products->product_name;
             $newProduct[$key][] = $products;
         }
-        return view('detailOrder', ['orders' => $newOrder, 'products' => $newProduct, 'id' => $id]);
+        return view('detailOrder', ['orders' => $newOrder, 'products' => $newProduct, 'id' => $id, 'shopName' => $shop]);
 
     } 
     public function detailOrderUser($id) 
@@ -216,8 +225,10 @@ class ShopController extends Controller
             $price[$key] = $total;
 
         }
+        $shopid = Detail::find($id);
+        $shop = Shop::find($shopid->shop_id);
         
-        return view('detailOrderUser', ['users' => $newUser, 'id' => $id, 'price' => $price]);
+        return view('detailOrderUser', ['users' => $newUser, 'id' => $id, 'price' => $price, 'shopName' => $shop]);
 
     } 
 
@@ -227,7 +238,9 @@ class ShopController extends Controller
             return redirect('/');
         }
         $orders = Order::where('detail_id',$id)->join('product','order.order_id', '=', 'product.id')->get();
-        return view('allOrder', ['orders' => $orders,'id' => $id]);
+        $shopid = Detail::find($id);
+        $shop = Shop::find($shopid->shop_id);
+        return view('allOrder', ['orders' => $orders,'id' => $id, 'shopName' => $shop]);
     } 
 
     public function detailEditPassword($id)
@@ -235,7 +248,10 @@ class ShopController extends Controller
         if( !is_numeric($id)) {
             return redirect('/');
         }
-        return view('detailEditPassword',['id' => $id]);
+        $shopid = Detail::find($id);
+        $shop = Shop::find($shopid->shop_id);
+
+        return view('detailEditPassword',['id' => $id, 'shopName' => $shop]);
     }
 
     public function detailEditPage(Request $request) 
@@ -244,7 +260,10 @@ class ShopController extends Controller
         if(Hash::check($request->password, $detail->password))
         {
             session()->put('edit'.$request->id, 'Y');
-            return view('editDetail',['detail' => $detail, 'id' => $request->id]);
+            $shopid = Detail::find($request->id);
+            $shop = Shop::find($shopid->shop_id);
+
+            return view('editDetail',['detail' => $detail, 'id' => $request->id, 'shopName' => $shop]);
         }
         return redirect('/');
     }
@@ -255,24 +274,26 @@ class ShopController extends Controller
             return redirect('/');
         }
         $detail = Detail::find($id);
-        return view('editDetail',['detail' => $detail, 'id' => $id]);
+        $shop = Shop::find($detail->shop_id);
+
+        return view('editDetail',['detail' => $detail, 'id' => $id, 'shopName' => $shop]);
     }
     public function detailEdit(Request $request)
     {
         $old = Detail::find($request->id);
         $uptime = $request->update .' '.$request->uptime.':00';
         $endtime = $request->enddate .' '.$request->endtime.':00';
+        $url = 'detailEditPage/'.$request->id;
 
         if($uptime > $endtime) {
-            return redirect('/')->withErrors('時間錯誤，結束日期不能早於開始日期');
+            return redirect($url)->withErrors('時間錯誤，結束日期不能早於開始日期');
         }
         
         Detail::where('id' ,$request->id)->update([
             'up_time' => $uptime,
             'end_time' => $endtime,
         ])->save();
-
-        return redirect('/');
+        return redirect($url);
 
     }
     public function detailOrderAdmin($id) 
@@ -283,8 +304,9 @@ class ShopController extends Controller
         }
         $orders = Order::where('detail_id',$id)->get();
         $shopID = Detail::find($id);
+        $shop = Shop::find($shopID->shop_id);
 
-        return view('adminAllOrder', ['orders' => $orders,'id' => $id,'shopID' => $shopID->shop_id]);
+        return view('adminAllOrder', ['orders' => $orders,'id' => $id,'shopID' => $shopID->shop_id, 'shopName' => $shop]);
 
     }
     public function detailOrderUserAdmin($id) 
@@ -294,6 +316,8 @@ class ShopController extends Controller
             return redirect('/');
         }
         $shopID = Detail::find($id);
+        $shop = Shop::find($shopID->shop_id);
+
         $users = DB::select('SELECT user,product_name,SUM(amount) as amount, (product_price * SUM(amount)) as total FROM `order` WHERE detail_id = ? GROUP BY user,product_name,product_price',[$id]);
         $newUser = [];
         $price = [];
@@ -320,7 +344,7 @@ class ShopController extends Controller
 
         }
         
-        return view('detailOrderUserAdmin', ['users' => $newUser, 'id' => $id, 'price' => $price, 'shopID' => $shopID->shop_id]);
+        return view('detailOrderUserAdmin', ['users' => $newUser, 'id' => $id, 'price' => $price, 'shopID' => $shopID->shop_id, 'shopName' => $shop]);
 
     } 
     public function detailOrderAdminList($id) 
@@ -332,6 +356,7 @@ class ShopController extends Controller
         $orders = DB::select('SELECT product_name,user,SUM(amount) as amount,product_price FROM `order` WHERE detail_id = ? GROUP BY product_name,user,product_price
         ',[$id]);
         $shopid = Detail::find($id);
+        $shop = Shop::find($shopid->shop_id);
         $product = Product::where('shop_id',$shopid->shop_id)->get();
         $newOrder = [];
         //將訂單依商品分類
@@ -347,7 +372,7 @@ class ShopController extends Controller
             $key = $products->product_name;
             $newProduct[$key][] = $products;
         }
-        return view('detailOrderAdminList', ['orders' => $newOrder, 'products' => $newProduct, 'id' => $id,'shopID' => $shopid->shop_id]);
+        return view('detailOrderAdminList', ['orders' => $newOrder, 'products' => $newProduct, 'id' => $id,'shopID' => $shopid->shop_id, 'shopName' => $shop]);
     }
 
     public function editOrder(Request $request) 
@@ -377,12 +402,14 @@ class ShopController extends Controller
             return redirect('/');
         }
         $shopID = Detail::find($orders->detail_id);
+        $shop = Shop::find($shopID->shop_id);
+
         if (!Session::has('edit'.$shopID->id) || !is_numeric($id))
         {
             return redirect('/');
         }
 
-        return view('editOrder', ['orders' => $orders,'id' => $id,'shopID' => $shopID->shop_id,'detailID' => $shopID->id]);
+        return view('editOrder', ['orders' => $orders,'id' => $id,'shopID' => $shopID->shop_id,'detailID' => $shopID->id, 'shopName' => $shop]);
     }
 
     public function orderPay($id) 
@@ -397,8 +424,9 @@ class ShopController extends Controller
             return redirect('/');
         }
         $shopID = Detail::find($id);
+        $shop = Shop::find($shopID->shop_id);
         
-        return view('detailOrderPay', ['orders' => $orders,'id' => $id, 'shopID' => $shopID->shop_id]);
+        return view('detailOrderPay', ['orders' => $orders,'id' => $id, 'shopID' => $shopID->shop_id, 'shopName' => $shop]);
     }
     public function historyPage()
     {
@@ -414,6 +442,15 @@ class ShopController extends Controller
             return '404';
         }
         $orders = Order::select('id','status','product_price','amount')->where('detail_id',$id)->get();
+        return $orders->toJson();
+    }
+
+    public function allOrderAjax($id) 
+    {   
+        if( !is_numeric($id)) {
+            return '404';
+        }
+        $orders = Order::where('detail_id',$id)->join('product','order.order_id', '=', 'product.id')->get();
         return $orders->toJson();
     }
 
@@ -462,7 +499,69 @@ class ShopController extends Controller
         }
 
         $products = Product::where('shop_id', $id)->get();
-        return view('shopContent', ['products' => $products]);
+        $shop = Shop::find($id);
+        return view('shopContent', ['products' => $products, 'shopName' => $shop]);
+    }
+
+    public function editShop($id)
+    {
+        if (!is_numeric($id))
+        {
+            return redirect('shop');
+        }
+
+        $products = Product::where('shop_id', $id)->get();
+        $shop = Shop::find($id);
+
+        return view('editShop', ['products' => $products, 'shopID' => $id, 'shopName' => $shop]);
+    }
+
+    public function addProducts(Request $request)
+    {
+        $itemsNum = count($request->items);
+        $priceNum = count($request->price);
+        $price = $request->price;
+
+        if($itemsNum != $priceNum){
+            return redirect()->back()->withErrors('參數錯誤，請勿留白');
+        };
+        //檢查商品
+        $itemPattern = "/^[A-Za-z0-9\x7f-\xffA]+$/";
+        $i = $itemsNum;
+        $j = 1;
+        foreach($request->items as $item) {
+            if(!isset($item) || !preg_match($itemPattern, $item, $matches)){
+                return redirect()->back()->withErrors('商品格式錯誤，請勿輸入特殊符號');
+            }
+            if($j != $i && $request->items[$j] == $item){
+                return redirect()->back()->withErrors('請勿輸入重複商品');
+            }
+            $j++;
+        }
+        //檢查價格
+        foreach($request->price as $priceCheck) {
+            if(!isset($item) || !is_numeric($priceCheck)){
+                return redirect()->back()->withErrors('價格格式錯誤，請輸入數字');
+            }
+        }
+        
+        foreach($request->items as $item) {
+            $products = Product::select('product_name')->where([['shop_id', $request->id],['product_name',$item]])->first();
+            if(isset($products)){
+                return redirect()->back()->withErrors('請勿輸入重複商品');
+            }
+        }
+
+        foreach($request->items as $key => $item)
+        {
+            Product::create([
+                'shop_id' => $request->id,
+                'product_name' => $item,
+                'product_price' => $price[$key]
+            ])->save();
+        }
+        $url = 'shopContent/'.$request->id;
+        return redirect($url)->withErrors('新增成功');
     }
 
 }

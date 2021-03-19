@@ -15,9 +15,12 @@ Route::get('/', 'ShopController@Index');
 
 Route::get('/shop', 'ShopController@shopIndex');
 Route::get('/shopContent/{id}', 'ShopController@shopContent');
+Route::get('/editShop/{id}', 'ShopController@editShop');
+
 
 Route::get('/addShop', 'ShopController@addShop');
 Route::post('/add', 'ShopController@postAddShop');
+Route::post('/addProducts', 'ShopController@addProducts');
 
 Route::get('/newDetail/{id}', 'ShopController@newDetailPage');
 Route::post('/newDetail', 'ShopController@newDetail');
@@ -59,6 +62,8 @@ Route::get('/getOrderStatus/{id}', 'ShopController@getOrderStatus');
 Route::get('/changOrderStatus/{id}/{status}', 'ShopController@changOrderStatus');
 Route::get('/allDetail', 'ShopController@allDetail');
 Route::get('/hisAllDetail', 'ShopController@hisAllDetail');
+Route::get('/allOrderAjax/{id}', 'ShopController@allOrderAjax');
+
 
 
 

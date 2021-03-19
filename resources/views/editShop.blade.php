@@ -31,39 +31,54 @@
                   <li class="breadcrumb-item"><a href="{{ url('/') }}">開放中訂單</a></li>
                   <li class="breadcrumb-item"><a href="{{ url('shop') }}">店家</a></li>
                   <li class="breadcrumb-item"><a href="{{ url('history') }}">歷史訂單</a></li>
-
+                  <li class="breadcrumb-item">{{$shopName->shop_name}}</li>
                 </ol>
             </nav>
         </div>
     </div>
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ url('addShop') }}">添加店家</a></li>
-        </ol>
-    </nav>
+    <form method="POST" action="{{ url('addProducts') }}" class="form-horizontal" role="form">
+      <tr>
+          新增商品
+          <br><br> 
+          {!! csrf_field() !!}
+          <td id="items">
+          1.   
+          <input id="items1" name="items[]" required="">
+          價格<input id="price1" name="price[]" required="">
+          <br><br> 
+          </td>
+          <input id="id" type="hidden" name="id" value="{{$shopID}}" required="">
+          <input id="add_items" name="add_items" type="button"  class="bt-add" value="新增商品欄位" style="margin-top:10px">
+          <input id="add" name="add" type="submit"  value="確認"  >
+      </tr>
+    </form>
     <table class="table">
-        <thead>
-          <tr>
-            <th scope="col">新增店家人員</th>
-            <th scope="col">餐廳名稱</th>
-            <th scope="col">編輯</th>
-            <th scope="col">開啟新訂單</th>
-          </tr>
-        </thead>
-        <tbody>
-            @foreach ($shop as $item)
-            <tr >
-                <th scope="col">{{$item->add_user}}</th>
-                <td><a href='{{ url("shopContent/{$item->id}") }}' class="alert-link">{{$item->shop_name}}</a></td>
-                <td><a href='{{ url("editShop/{$item->id}") }}' class="alert-link">編輯</a></td>
-                <td><a href='{{ url("newDetail/{$item->id}") }}' class="alert-link">新訂單</a></td>
+          <thead>
+            <tr>
+                <th scope="col">商品名</th>
+                <th scope="col">價格</th>
+                <th scope="col">刪除</th>
             </tr>
-            @endforeach
-        </tbody>
-      </table>
-    </div>
-<script> 
-        var shop = [];
-        $items = $('#start');
-        $items.after('<tr id="start"> <th scope=row>1</th> <td>Mark</td> <td>Otto</td> </tr>');
+            </thead>
+            <tbody>
+                @foreach ($products as $product)
+                <tr>
+                    <th scope="row">{{$product->product_name}}</th>
+                    <th scope="row">{{'$'.$product->product_price}}</th>
+                    <th scope="col">刪除</th>
+                </tr>
+                @endforeach
+            </tbody>
+    </table>
+  </div>
+<script>
+  	var i = 1;
+
+    $('#add_items').click(function(){
+    var o = '價格'
+		$items = $('#price'+i);
+		i++;
+		$items.after('<br><br>'+i+'.    <input id="items' + i + '" name="items[]" ' + 'required="" >'+o+'<input id="price' + i + '" name="price[]" ' + 'required="" >');
+	})
 </script>
+

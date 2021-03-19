@@ -31,7 +31,7 @@
                   <li class="breadcrumb-item"><a href="{{ url('/') }}">開放中訂單</a></li>
                   <li class="breadcrumb-item"><a href="{{ url('shop') }}">店家</a></li>
                   <li class="breadcrumb-item"><a href="{{ url('history') }}">歷史訂單</a></li>
-
+                  <li class="breadcrumb-item">{{$shopName->shop_name}}</li>
                 </ol>
             </nav>
         </div>
@@ -56,20 +56,36 @@
         </tr>
         </thead>
         <tbody>
-            @foreach ($orders as  $order)
-            <tr>
-                <th scope="row">{{$order->product_name}}</th>
-                <td>{{$order->product_price}}</td>
-                <td>{{$order->user}}</td>
-                <td>{{$order->amount}}</td>
-                <td>{{$order->ps}}</td>
+            <tr id='tr'>
             </tr>
-            @endforeach
     </tbody>
     </table>
 </div>
 <script> 
-        var shop = [];
-        $items = $('#start');
-        $items.after('<tr id="start"> <th scope=row>1</th> <td>Mark</td> <td>Otto</td> </tr>');
+    var id = {{$id}}
+    var url = '/allOrderAjax/'+id;
+    
+    $.ajax({
+    url: url,
+    type: "GET",
+    dataType: "text",
+    cache: false,
+    success: function(response) {
+        var arr = JSON.parse(response);
+        var forEachIt = arr.forEach(function(item, index, array){
+            console.log(item);
+
+            $tr = $('#tr');
+            var oao = '<tr><th scope="row">'+item.product_name+'</th>'
+            oao += '<td>'+item.product_price+'</td>';
+            oao += '<td>'+item.user+'</td>'
+            oao += '<td>'+item.amount+'</td>';
+            oao += '<td>'+item.ps+'</td>';
+            $tr.after(oao);
+        });
+    },
+    error: function(){
+        console.log('哪裡怪怪的');
+        } 
+});
 </script>

@@ -54,7 +54,7 @@
     </div>
     <script> 
         $.ajax({
-        url: "/food/public/allDetail",
+        url: "/allDetail",
         type: "GET",
         dataType: "text",
         cache: false,

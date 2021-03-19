@@ -31,7 +31,7 @@
                   <li class="breadcrumb-item"><a href="{{ url('/') }}">開放中訂單</a></li>
                   <li class="breadcrumb-item"><a href="{{ url('shop') }}">店家</a></li>
                   <li class="breadcrumb-item"><a href="{{ url('history') }}">歷史訂單</a></li>
-
+                  <li class="breadcrumb-item">{{$shopName->shop_name}}</li>
                 </ol>
             </nav>
         </div>
@@ -78,7 +78,7 @@
 <script> 
         var id = {{$id}}
         $.ajax({
-            url: "/food/public/getOrderStatus/"+id,
+            url: "/getOrderStatus/"+id,
             type: "GET",
             dataType: "text",
             cache: false,
@@ -113,7 +113,7 @@
             var price =  document.getElementById('price'+id).innerHTML
             var amount =  document.getElementById('amount'+id).innerHTML
         $.ajax({
-            url: "/food/public/changOrderStatus/"+id+'/'+status,
+            url: "/changOrderStatus/"+id+'/'+status,
             type: "GET",
             dataType: "text",
             cache: false,
