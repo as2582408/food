@@ -21,6 +21,7 @@ class CreateOrderTable extends Migration
             $table->integer('amount');
             $table->string('ps', 30);
             $table->string('product_name', 30);
+            $table->integer('product_price');
             $table->enum('status', ['Y','N']);        
         });
     }
