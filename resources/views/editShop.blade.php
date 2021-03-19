@@ -41,14 +41,18 @@
           新增商品
           <br><br> 
           {!! csrf_field() !!}
-          <td id="items">
+          <td id="items">         
+          <div id="div"></div>
+          <div id="div1">
           1.   
           <input id="items1" name="items[]" required="">
           價格<input id="price1" name="price[]" required="">
-          <br><br> 
+          <br>
+          </div>
           </td>
           <input id="id" type="hidden" name="id" value="{{$shopID}}" required="">
           <input id="add_items" name="add_items" type="button"  class="bt-add" value="新增商品欄位" style="margin-top:10px">
+          <input id="delitems" name="add_items" type="button"  class="bt-add" value="刪除" style="margin-top:10px">
           <input id="add" name="add" type="submit"  value="確認"  >
       </tr>
     </form>
@@ -71,14 +75,25 @@
             </tbody>
     </table>
   </div>
-<script>
+  <script>
   	var i = 1;
 
     $('#add_items').click(function(){
-    var o = '價格'
-		$items = $('#price'+i);
+      var o = '價格'
+		  $items = $('#div'+i);
+
+      if(i < 0) {
+        i = 0
+        $items = $('#div');
+      }
 		i++;
-		$items.after('<br><br>'+i+'.    <input id="items' + i + '" name="items[]" ' + 'required="" >'+o+'<input id="price' + i + '" name="price[]" ' + 'required="" >');
+		$items.after('<div id="div'+i+'"><br>'+i+'.    <input id="items' + i + '" name="items[]" ' + ' required="" >'+o+'<input id="price' + i + '" name="price[]" ' + ' required="" ></div>');
+	})
+  
+  $('#delitems').click(function(){
+		$items = $('#div'+i);
+		$items.remove();
+    i--
 	})
 </script>
 

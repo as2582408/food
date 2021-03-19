@@ -45,6 +45,7 @@
                 <br><br>
               商店名<input id="shop" name="shop" required="">
                 <br><br>
+              <div id="div"></div>
               <div id="div1">
               1.   
               <input id="items1" name="items[]" required="">
@@ -66,12 +67,17 @@
     </table>
 </form>
   </div>
-<script>
+  <script>
   	var i = 2;
 
     $('#add_items').click(function(){
-    var o = '價格'
-		$items = $('#div'+i);
+      var o = '價格'
+		  $items = $('#div'+i);
+
+      if(i < 0) {
+        i = 0
+        $items = $('#div');
+      }
 		i++;
 		$items.after('<div id="div'+i+'"><br>'+i+'.    <input id="items' + i + '" name="items[]" ' + ' required="" >'+o+'<input id="price' + i + '" name="price[]" ' + ' required="" ></div>');
 	})
@@ -79,8 +85,7 @@
   $('#delitems').click(function(){
 		$items = $('#div'+i);
 		$items.remove();
-
-    i--;
+    i--
 	})
 </script>
 
