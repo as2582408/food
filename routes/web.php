@@ -53,7 +53,7 @@ Route::get('/detailOrderPay/{id}', 'ShopController@orderPay');
 Route::get('/detailOrderPayAll/{id}', 'ShopController@orderPay');
 
 //訂購頁面
-Route::get('/order/{id}/{shopId}', 'ShopController@orderPage');
+Route::get('/order/{id}/{shopId}/{admin}', 'ShopController@orderPage');
 Route::post('/order', 'ShopController@addOrder');
 //顯示詳細頁面
 Route::get('/detailOrder/{id}', 'ShopController@detailOrder');

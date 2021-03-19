@@ -82,7 +82,7 @@
       var o = '價格'
 		  $items = $('#div'+i);
 
-      if(i < 0) {
+      if(i <= 0) {
         i = 0
         $items = $('#div');
       }

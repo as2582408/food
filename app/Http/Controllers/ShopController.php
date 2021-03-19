@@ -122,14 +122,23 @@ class ShopController extends Controller
         return redirect('/');
     }
 
-    public function orderPage($id, $shopId) 
+    public function orderPage($id, $shopId, $admin) 
     {
         if( !is_numeric($id) || !is_numeric($shopId)) {
             return redirect('/');
         }
+        $detail = Detail::find($id);
+        //會員超時無法進入
+        if($admin == 'user' && $detail->end_time < date("Y-m-d H:i:s")) {
+            return redirect('/')->withErrors('該訂單已關閉');
+        }
+        //管理員要有指定的session才能登入
+        if($admin == 'admin' && !Session::has('edit'.$id) ) {
+            return redirect('/')->withErrors('認證錯誤');
+        }
         $shop = Shop::find($shopId);
         $products = Product::where('shop_id',$shopId)->get();
-        return view('order',['products' => $products, 'detailId' => $id, 'shopName' => $shop]);
+        return view('order',['products' => $products, 'detailId' => $id, 'shopName' => $shop, 'adcheck' => $admin]);
     }
 
     public function addOrder(Request $request) 
@@ -137,7 +146,11 @@ class ShopController extends Controller
         $products = Product::select('product.id','product.product_name','product.product_price')        
         ->join('detail', 'product.shop_id', '=', 'detail.shop_id')
         ->get();
-
+        if($request->adcheck == 'admin'){
+            $url = 'detailOrderAdmin/'.$request->id;
+        } else {
+            $url = '/';
+        }
         foreach($products as $product) {
             //彈性變數
             $amount = 'amount'.$product->id;
@@ -145,17 +158,27 @@ class ShopController extends Controller
 
             $itemPattern = "/^[A-Za-z0-9\x7f-\xffA]+$/";
             $this->validate($request, [
-                'name' => 'required|max:255|regex:/^[A-Za-z0-9\x7f-\xffA]+$/',
+                'name' => 'required|max:30|regex:/^[A-Za-z0-9\x7f-\xffA]+$/',
             ]);
 
             if(isset($request->$ps) && !preg_match($itemPattern, $request->$ps, $matches)) {
-                return redirect('/')->withErrors('備註格式錯誤，請勿輸入特殊符號');
+                $this->validate($request, [
+                    $ps => 'max:30|regex:/^[A-Za-z0-9\x7f-\xffA]+$/',
+                ], [
+                    $ps.'.max' => '請勿輸入過長備註',
+                    $ps.'.regex' => '備註格式錯誤，請勿輸入特殊符號'
+                ]);
             }
-            if(isset($request->$amount) && !is_numeric($request->$amount)) {
-                return redirect('/')->withErrors('數目格式錯誤，請輸入數字');
+            if(isset($request->$amount)) {
+                $this->validate($request, [
+                    $amount => 'numeric|min:1'
+                ], [
+                    $amount.'.numeric' => '數目格式錯誤，請輸入數字',
+                    $amount.'.min' => '數目錯誤，請大於一'
+                ]);
             }
             //如果商品存在數量才進行動作
-            if(isset($request->$amount)) {
+            if($request->$amount > 0) {
                     $Pss = (isset($request->$ps)) ? $request->$ps : '';
                     Order::create([
                         'detail_id' => $request->id,
@@ -169,7 +192,7 @@ class ShopController extends Controller
                     ])->save();
             }
         }
-        return redirect('/');
+        return redirect($url);
     }
 
     public function detailOrder($id) 
@@ -297,7 +320,7 @@ class ShopController extends Controller
         Detail::where('id' ,$request->id)->update([
             'up_time' => $uptime,
             'end_time' => $endtime,
-        ])->save();
+        ]);
         return redirect($url);
 
     }
@@ -538,6 +561,9 @@ class ShopController extends Controller
     }
     public function addProducts(Request $request)
     {
+        if(!isset($request->items) || !isset($request->price)) {
+            return redirect()->back()->withErrors('參數錯誤，請勿留白');
+        }
         $itemsNum = count($request->items);
         $priceNum = count($request->price);
         $price = $request->price;

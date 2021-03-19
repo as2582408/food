@@ -58,6 +58,7 @@
                 @endforeach
             </tbody>
             <input id="id" name="id" type="hidden" value="{{$detailId}}">
+            <input id="adcheck" name="adcheck" type="hidden" value="{{$adcheck}}">
             <td>
               訂購者<input id="name" name="name" required=""> 
               <button id="submit" name="submit" class="btn btn-sm btn-default">送出</button>

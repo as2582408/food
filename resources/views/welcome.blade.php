@@ -67,7 +67,7 @@
                 var oao = '<tr><td>'+item.openUser+'</td>'
                 oao += '<td><a href="{{ url("detailOrder") }}/'+item.id+'">'+item.shop_name+'</a></td>';
                 oao += '<td>'+item.end_time+'</td>'
-                oao += '<td><a href="{{ url("order") }}/'+item.id+'/'+item.shopId+'"class="alert-link">訂購</a></td>';
+                oao += '<td><a href="{{ url("order") }}/'+item.id+'/'+item.shopId+'/user"class="alert-link">訂購</a></td>';
                 oao += '<td><a href="{{ url("detailEditPassword") }}/'+item.id+'"class="alert-link">管理</a></td></tr>';
                 $tr.after(oao);
             });

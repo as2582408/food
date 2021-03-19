@@ -41,7 +41,7 @@
             <li class="breadcrumb-item"><a href="{{ url("detailEditPage/{$id}") }}">訂單設定</a></li>
           <li class="breadcrumb-item"><a href="{{ url("detailOrderPay/{$detail->id}") }}">付款紀錄</a></li>
           <li class="breadcrumb-item"><a href="{{ url("detailOrderAdmin/{$detail->id}") }}">項目統計</a></li>
-          <li class="breadcrumb-item"><a href='{{ url("order/{$detail->id}/{$detail->shop_id}") }}' class="alert-link">管理者代訂</a></li>
+          <li class="breadcrumb-item"><a href='{{ url("order/{$detail->id}/{$detail->shop_id}/admin") }}' class="alert-link">管理者代訂</a></li>
         </ol>
     </nav>
     <form method="POST" action="{{ url('detailEdit') }}" class="form-horizontal" role="form">

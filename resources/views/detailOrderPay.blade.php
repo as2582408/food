@@ -42,7 +42,7 @@
                 <li class="breadcrumb-item"><a href="{{ url("detailEditPage/{$id}") }}">訂單設定</a></li>
                 <li class="breadcrumb-item"><a href="{{ url("detailOrderPay/{$id}") }}">付款紀錄</a></li>
                 <li class="breadcrumb-item"><a href="{{ url("detailOrderAdmin/{$id}") }}">項目統計</a></li>
-                <li class="breadcrumb-item"><a href='{{ url("order/{$id}/{$shopID}") }}' class="alert-link">管理者代訂</a></li>
+                <li class="breadcrumb-item"><a href='{{ url("order/{$id}/{$shopID}/admin") }}' class="alert-link">管理者代訂</a></li>
             </ol>
         </nav>
     </div>
@@ -59,21 +59,26 @@
         <tbody>
             @foreach ($orders as  $order)
             <tr>
-                <th scope="row" id={{$order->id}} onclick="chang('{{$order->id}}')">{{$order->product_name}}</th>
+                <th scope="row">{{$order->product_name}}</th>
                 <td id = 'price{{$order->id}}'>{{$order->product_price}}</td>
-                <td>{{$order->user}}</td>
+                <td id={{$order->id}} onclick="chang('{{$order->id}}')">{{$order->user}}</td>
                 <td id = 'amount{{$order->id}}'>{{$order->amount}}</td>
                 <td>{{$order->ps}}</td>
             </tr>
             @endforeach
-            <tr>
-                <th>未付款金額</th>
-                <td id = "noPay"></td>
-                <th>已付款金額</th>
-                <td id = "Pay"></td>
-            </tr>
-    </tbody>
+        </tbody>
     </table>
+    <table class="table table-sm">
+    <tr>
+        <th>未付款金額</th>
+        <td id = "noPay"></td>
+        <th>已付款金額</th>
+        <td id = "Pay"></td>
+        <th>總計</th>
+        <td id = "total"></td>
+    </tr>
+    </table>
+
 </div>
 <script> 
         var id = {{$id}}
@@ -101,6 +106,7 @@
                 });
                 document.getElementById('noPay').innerHTML = noPay;
                 document.getElementById('Pay').innerHTML = Pay;
+                document.getElementById('total').innerHTML = parseInt(Pay) + parseInt(noPay);
             },
             error: function(){
                 console.log('哪裡怪怪的');
