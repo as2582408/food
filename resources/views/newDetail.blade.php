@@ -40,8 +40,6 @@
     <table>
           <tr>
             {!! csrf_field() !!}
-            開始時間<input id="update" name="update" type="date" required=""><input id="uptime" name="uptime" type="time" required="">
-            <br><br>
             結束時間<input id="enddate" name="enddate" type="date" required=""><input id="endtime" name="endtime" type="time" required="">
             <br><br>
             管理密碼<input id="password" name="password" required="">

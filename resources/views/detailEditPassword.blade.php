@@ -45,6 +45,7 @@
               </tr>
             </thead>
         </table>
+        <button id="submit" name="submit" class="btn btn-sm btn-default">送出</button>
         </form> 
         </div>
     </div>

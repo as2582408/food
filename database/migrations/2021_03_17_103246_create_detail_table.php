@@ -17,7 +17,6 @@ class CreateDetailTable extends Migration
             $table->increments('id');
             $table->integer('shop_id');
             $table->timestamp('date')->nullable();
-            $table->timestamp('up_time')->nullable();
             $table->timestamp('end_time')->nullable();
             $table->string('password', 100);
             $table->enum('status', ['Y','N']);

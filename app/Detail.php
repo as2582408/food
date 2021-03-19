@@ -11,6 +11,6 @@ class Detail extends Model
     protected $table = 'detail';
 
     protected $fillable = [
-        'shop_id','up_time','end_time','password','date','status','openUser'
+        'shop_id','end_time','password','date','status','openUser'
     ];
 }

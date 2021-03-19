@@ -92,18 +92,14 @@ class ShopController extends Controller
         if(!isset($shop) || !is_numeric($id)) {
             return redirect('/');
         };
-       
+        
         return view('newDetail',['id' => $id, 'shopName' => $shop]);
     }
     public function newDetail(Request $request)
     {
 
-        $uptime = $request->update .' '.$request->uptime.':00';
         $endtime = $request->enddate .' '.$request->endtime.':00';
 
-        if($uptime > $endtime) {
-            return redirect('/shop')->withErrors('時間錯誤，結束日期不能早於開始日期');
-        }
         $this->validate($request, [
             'password' => 'required|regex:/^[A-Za-z0-9]+$/',
             'openUser' => 'required|regex:/^[A-Za-z0-9\x7f-\xffA]+$/',
@@ -112,7 +108,6 @@ class ShopController extends Controller
         Detail::create([
             'shop_id' => $request->id,
             'date' => date("Y-m-d H:i:s"),
-            'up_time' => $uptime,
             'end_time' => $endtime,
             'password' => bcrypt($request->password),
             'status' => 'Y',
@@ -134,7 +129,7 @@ class ShopController extends Controller
         }
         //管理員要有指定的session才能登入
         if($admin == 'admin' && !Session::has('edit'.$id) ) {
-            return redirect('/')->withErrors('認證錯誤');
+            return redirect('/')->withErrors('認證過期，請重新登入');;
         }
         $shop = Shop::find($shopId);
         $products = Product::where('shop_id',$shopId)->get();
@@ -293,13 +288,16 @@ class ShopController extends Controller
 
             return view('editDetail',['detail' => $detail, 'id' => $request->id, 'shopName' => $shop]);
         }
-        return redirect('/');
+        return redirect('detailEditPassword/'.$request->id)->withErrors('密碼錯誤');
     }
     public function getDetailEditPage($id) 
     {   
-        if (!Session::has('edit'.$id) || !is_numeric($id))
-        {
+        if(!is_numeric($id)) {
             return redirect('/');
+        }
+        if (!Session::has('edit'.$id))
+        {
+            return redirect('/')->withErrors('認證過期，請重新登入');
         }
         $detail = Detail::find($id);
         $shop = Shop::find($detail->shop_id);
@@ -309,16 +307,10 @@ class ShopController extends Controller
     public function detailEdit(Request $request)
     {
         $old = Detail::find($request->id);
-        $uptime = $request->update .' '.$request->uptime.':00';
         $endtime = $request->enddate .' '.$request->endtime.':00';
         $url = 'detailEditPage/'.$request->id;
-
-        if($uptime > $endtime) {
-            return redirect($url)->withErrors('時間錯誤，結束日期不能早於開始日期');
-        }
         
         Detail::where('id' ,$request->id)->update([
-            'up_time' => $uptime,
             'end_time' => $endtime,
         ]);
         return redirect($url);
@@ -326,9 +318,12 @@ class ShopController extends Controller
     }
     public function detailOrderAdmin($id) 
     {
-        if (!Session::has('edit'.$id) || !is_numeric($id))
-        {
+        if(!is_numeric($id)) {
             return redirect('/');
+        }
+        if (!Session::has('edit'.$id))
+        {
+            return redirect('/')->withErrors('認證過期，請重新登入');
         }
         $orders = Order::where('detail_id',$id)->get();
         $shopID = Detail::find($id);
@@ -339,9 +334,12 @@ class ShopController extends Controller
     }
     public function detailOrderUserAdmin($id) 
     {
-        if (!Session::has('edit'.$id) || !is_numeric($id))
-        {
+        if(!is_numeric($id)) {
             return redirect('/');
+        }
+        if (!Session::has('edit'.$id))
+        {
+            return redirect('/')->withErrors('認證過期，請重新登入');;
         }
         $shopID = Detail::find($id);
         $shop = Shop::find($shopID->shop_id);
@@ -377,9 +375,12 @@ class ShopController extends Controller
     } 
     public function detailOrderAdminList($id) 
     {
-        if (!Session::has('edit'.$id) || !is_numeric($id))
-        {
+        if (!is_numeric($id)) {
             return redirect('/');
+        }
+        if (!Session::has('edit'.$id))
+        {
+            return redirect('/')->withErrors('認證過期，請重新登入');;
         }
         $orders = DB::select('SELECT product_name,user,SUM(amount) as amount,product_price FROM `order` WHERE detail_id = ? GROUP BY product_name,user,product_price
         ',[$id]);
@@ -410,7 +411,7 @@ class ShopController extends Controller
             'user' => 'required|max:255|regex:/^[A-Za-z0-9\x7f-\xffA]+$/',
             'ps' => 'max:255|regex:/^[A-Za-z0-9\x7f-\xffA]+$/',
         ]);
-        if(isset($request->amount) && !is_numeric($request->amount)) {
+        if (isset($request->amount) && !is_numeric($request->amount)) {
             return redirect('/')->withErrors('數目格式錯誤，請輸入數字');
         }
         
@@ -424,10 +425,13 @@ class ShopController extends Controller
 
     public function editOrderPage($id) 
     {
-        $orders = Order::find($id);
-        if (!isset($orders) || !Session::has('edit'.$orders->detail_id) || !is_numeric($id))
-        {
+        if (!is_numeric($id)) {
             return redirect('/');
+        }
+        $orders = Order::find($id);
+        if (!isset($orders) || !Session::has('edit'.$orders->detail_id))
+        {
+            return redirect('/')->withErrors('認證過期，請重新登入');;
         }
         $shopID = Detail::find($orders->detail_id);
         $shop = Shop::find($shopID->shop_id);
@@ -442,9 +446,12 @@ class ShopController extends Controller
 
     public function orderPay($id) 
     {   
+        if (!is_numeric($id)) {
+            return redirect('/');
+        }
         if (!Session::has('edit'.$id) || !is_numeric($id))
         {
-            return redirect('/');
+            return redirect('/')->withErrors('認證過期，請重新登入');
         }
 
         $orders = Order::where('detail_id',$id)->get();
@@ -466,7 +473,7 @@ class ShopController extends Controller
 
     public function getOrderStatus($id) 
     {   
-        if( !is_numeric($id)) {
+        if (!is_numeric($id)) {
             return '404';
         }
         $orders = Order::select('id','status','product_price','amount')->where('detail_id',$id)->get();
@@ -475,7 +482,7 @@ class ShopController extends Controller
 
     public function allOrderAjax($id) 
     {   
-        if( !is_numeric($id)) {
+        if ( !is_numeric($id)) {
             return '404';
         }
         $orders = Order::where('detail_id',$id)->join('product','order.order_id', '=', 'product.id')->get();
@@ -484,7 +491,7 @@ class ShopController extends Controller
 
     public function changOrderStatus($id) 
     {   
-        if(!is_numeric($id)) {
+        if (!is_numeric($id)) {
             return false;
         }
         $orderStatus = Order::select('status')->where('id', $id)->first();
