@@ -18,6 +18,7 @@ class CreateProductTable extends Migration
             $table->integer('shop_id');
             $table->string('product_name', 30);
             $table->integer('product_price');
+            $table->enum('product_status', ['Y','N']);
         });
     }
 

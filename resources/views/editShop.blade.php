@@ -65,8 +65,8 @@
                 <tr>
                     <th scope="row">{{$product->product_name}}</th>
                     <th scope="row">{{'$'.$product->product_price}}</th>
-                    <th scope="col">刪除</th>
-                </tr>
+                    <td><a href='{{ url("delete/{$product->id}") }}' class="alert-link">刪除</a></td>
+                  </tr>
                 @endforeach
             </tbody>
     </table>

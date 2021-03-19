@@ -73,7 +73,8 @@ class ShopController extends Controller
             Product::create([
                 'shop_id' => $shopId,
                 'product_name' => $item,
-                'product_price' => $price[$key]
+                'product_price' => $price[$key],
+                'product_status' => 'Y'
             ])->save();
         }
         return redirect('shop');
@@ -515,7 +516,18 @@ class ShopController extends Controller
 
         return view('editShop', ['products' => $products, 'shopID' => $id, 'shopName' => $shop]);
     }
+    public function delete($id)
+    {
+        if (!is_numeric($id))
+        {
+            return redirect('shop');
+        }
 
+        Product::where('id', $id)->delete();
+        Order::where('order_id',$id)->delete();
+
+        return redirect()->back()->withErrors('刪除成功');
+    }
     public function addProducts(Request $request)
     {
         $itemsNum = count($request->items);

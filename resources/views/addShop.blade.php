@@ -45,16 +45,22 @@
                 <br><br>
               商店名<input id="shop" name="shop" required="">
                 <br><br>
+              <div id="div1">
               1.   
               <input id="items1" name="items[]" required="">
               價格<input id="price1" name="price[]" required="">
               <br><br>
+              </div>
+              <div id="div2">
               2.   
               <input id="items2" name="items[]" required="">
               價格<input id="price2" name="price[]" required="">
-              <br>   
+              <br>
+              </div>
+   
               </td>
               <input id="add_items" name="add_items" type="button"  class="bt-add" value="新增商品欄位" style="margin-top:10px">
+              <input id="delitems" name="add_items" type="button"  class="bt-add" value="刪除" style="margin-top:10px">
               <input id="add" name="add" type="submit"  value="確認"  >
           </tr>
     </table>
@@ -65,9 +71,16 @@
 
     $('#add_items').click(function(){
     var o = '價格'
-		$items = $('#price'+i);
+		$items = $('#div'+i);
 		i++;
-		$items.after('<br><br>'+i+'.    <input id="items' + i + '" name="items[]" ' + 'required="" >'+o+'<input id="price' + i + '" name="price[]" ' + 'required="" >');
+		$items.after('<div id="div'+i+'"><br>'+i+'.    <input id="items' + i + '" name="items[]" ' + ' required="" >'+o+'<input id="price' + i + '" name="price[]" ' + ' required="" ></div>');
+	})
+  
+  $('#delitems').click(function(){
+		$items = $('#div'+i);
+		$items.remove();
+
+    i--;
 	})
 </script>
 

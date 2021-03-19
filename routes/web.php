@@ -16,6 +16,8 @@ Route::get('/', 'ShopController@Index');
 Route::get('/shop', 'ShopController@shopIndex');
 Route::get('/shopContent/{id}', 'ShopController@shopContent');
 Route::get('/editShop/{id}', 'ShopController@editShop');
+Route::get('/delete/{id}', 'ShopController@delete');
+
 
 
 Route::get('/addShop', 'ShopController@addShop');
@@ -28,6 +30,7 @@ Route::get('/detailEditPassword/{id}', 'ShopController@detailEditPassword');
 //管理編輯訂單頁面
 Route::post('/detailEditPage', 'ShopController@detailEditPage');
 Route::get('/detailEditPage/{id}', 'ShopController@getDetailEditPage');
+
 //編輯
 Route::post('/detailEdit', 'ShopController@detailEdit');
 Route::get('/del/{id}', 'ShopController@delOrder');
