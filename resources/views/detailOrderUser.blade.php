@@ -51,6 +51,8 @@
             <th scope="col">訂購人</th>
             <th scope="col">總價</th>
             <th scope="col">商品</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -60,7 +62,8 @@
                 <th scope="row">{{'$'.$price[$user_name]}}</th>
 
                 @foreach ($products as $product)
-                    <td>{{$product->product_name}}{{' x '.$product->amount}}</td>
+                    <td id ="{{$user_name.'-'}}{{$product->order_id}}">{{$product->product_name}}{{' x '.$product->amount}}
+                    </td>
                 @endforeach
             </tr>
             @endforeach
@@ -68,7 +71,52 @@
     </table>
 </div>
 <script> 
-        var shop = [];
-        $items = $('#start');
-        $items.after('<tr id="start"> <th scope=row>1</th> <td>Mark</td> <td>Otto</td> </tr>');
+    var id = {{$id}}
+    var retext;
+    $.ajax({
+        url: "/ajaxDetailOrderUser/"+id,
+        type: "GET",
+        dataType: "text",
+        cache: false,
+        success: function(response) {
+            var arr = JSON.parse(response);
+        var forEachIt = arr.forEach(function(item, index, array){
+            var id = item.user+'-'+item.order_id;
+            document.getElementById(id).style['color'] = 'blue';
+            document.getElementById(id).setAttribute('onclick','get("'+id+'")')
+        });
+        },
+        error: function(){
+            console.log('哪裡怪怪的');
+            } 
+    });
+
+    function get(id){
+    $.ajax({
+        url: "/ajaxOrderUser/"+id,
+        type: "GET",
+        dataType: "text",
+        cache: false,
+        success: function(response) {
+            retext = document.getElementById(id).innerHTML;
+            var text = document.getElementById(id).innerHTML;
+            var arr = JSON.parse(response);
+            var forEachIt = arr.forEach(function(item, index, array){
+                text = text+'<br>x'+ item.amount +' '+item.ps;
+            });
+            document.getElementById(id).innerHTML = text;
+            document.getElementById(id).removeAttribute('onclick');
+            document.getElementById(id).setAttribute('onclick','reset("'+id+'")')
+        },
+        error: function(){
+            console.log('哪裡怪怪的');
+            } 
+        });
+    }
+    
+    function reset(id){
+        document.getElementById(id).innerHTML = retext;
+        document.getElementById(id).removeAttribute('onclick');
+        document.getElementById(id).setAttribute('onclick','get("'+id+'")')
+    }
 </script>

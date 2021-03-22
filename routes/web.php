@@ -66,6 +66,8 @@ Route::get('/changOrderStatus/{id}', 'ShopController@changOrderStatus');
 Route::get('/allDetail', 'ShopController@allDetail');
 Route::get('/hisAllDetail', 'ShopController@hisAllDetail');
 Route::get('/allOrderAjax/{id}', 'ShopController@allOrderAjax');
+Route::get('/ajaxDetailOrderUser/{id}', 'ShopController@ajaxDetailOrderUser');
+Route::get('/ajaxOrderUser/{id}', 'ShopController@ajaxOrderUser');
 
 
 

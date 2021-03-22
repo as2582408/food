@@ -195,7 +195,7 @@ class ShopController extends Controller
         if( !is_numeric($id)) {
             return redirect('/');
         }
-        $orders = DB::select('SELECT product_name,user,SUM(amount) as amount,product_price FROM `order` WHERE detail_id = ? GROUP BY product_name,user,product_price
+        $orders = DB::select('SELECT product_name,user,SUM(amount) as amount,product_price,order_id FROM `order` WHERE detail_id = ? GROUP BY product_name,user,product_price,order_id
         ',[$id]);
         $shopid = Detail::find($id);
         $product = Product::where('shop_id',$shopid->shop_id)->get();
@@ -223,7 +223,8 @@ class ShopController extends Controller
         if( !is_numeric($id)) {
             return redirect('/');
         }
-        $users = DB::select('SELECT user,product_name,SUM(amount) as amount, (product_price * SUM(amount)) as total FROM `order` WHERE detail_id = ? GROUP BY user,product_name,product_price',[$id]);
+        $users = DB::select('SELECT user,product_name,SUM(amount) as amount, (product_price * SUM(amount)) as total,order_id FROM `order` WHERE detail_id = ? GROUP BY user,product_name,product_price,order_id
+        ',[$id]);
         $newUser = [];
         $price = [];
         $total = 0;
@@ -344,7 +345,7 @@ class ShopController extends Controller
         $shopID = Detail::find($id);
         $shop = Shop::find($shopID->shop_id);
 
-        $users = DB::select('SELECT user,product_name,SUM(amount) as amount, (product_price * SUM(amount)) as total FROM `order` WHERE detail_id = ? GROUP BY user,product_name,product_price',[$id]);
+        $users = DB::select('SELECT user,product_name,SUM(amount) as amount, (product_price * SUM(amount)) as total, order_id FROM `order` WHERE detail_id = ? GROUP BY user,product_name,product_price,order_id',[$id]);
         $newUser = [];
         $price = [];
         $total = 0;
@@ -382,7 +383,7 @@ class ShopController extends Controller
         {
             return redirect('/')->withErrors('認證過期，請重新登入');;
         }
-        $orders = DB::select('SELECT product_name,user,SUM(amount) as amount,product_price FROM `order` WHERE detail_id = ? GROUP BY product_name,user,product_price
+        $orders = DB::select('SELECT product_name,user,SUM(amount) as amount,product_price,order_id FROM `order` WHERE detail_id = ? GROUP BY product_name,user,product_price,order_id
         ',[$id]);
         $shopid = Detail::find($id);
         $shop = Shop::find($shopid->shop_id);
@@ -617,4 +618,18 @@ class ShopController extends Controller
         return redirect($url)->withErrors('新增成功');
     }
 
+    public function ajaxDetailOrderUser($id)
+    {
+        $users = DB::select('SELECT user,order_id FROM `order` WHERE detail_id = ? AND ps != "" GROUP BY user,product_name,product_price,order_id
+        ',[$id]);
+
+        return $users;
+    }
+
+    public function ajaxOrderUser($id)
+    {
+        $idarr = mb_split('-', $id);
+        $ps = DB::select('SELECT ps,amount FROM `order` WHERE user = ? and order_id = ?',[$idarr[0], $idarr[1]]);
+        return $ps;
+    }
 }
