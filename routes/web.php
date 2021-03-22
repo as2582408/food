@@ -50,7 +50,8 @@ Route::get('/history', 'ShopController@historyPage');
 
 //付款頁面
 Route::get('/detailOrderPay/{id}', 'ShopController@orderPay');
-Route::get('/detailOrderPayAll/{id}', 'ShopController@orderPay');
+Route::get('/detailOrderAdminListPay/{id}', 'ShopController@detailOrderAdminListPay');
+Route::get('/detailOrderUserAdminPay/{id}', 'ShopController@detailOrderUserAdminPay');
 
 //訂購頁面
 Route::get('/order/{id}/{shopId}/{admin}', 'ShopController@orderPage');
@@ -68,8 +69,13 @@ Route::get('/hisAllDetail', 'ShopController@hisAllDetail');
 Route::get('/allOrderAjax/{id}', 'ShopController@allOrderAjax');
 Route::get('/ajaxDetailOrderUser/{id}', 'ShopController@ajaxDetailOrderUser');
 Route::get('/ajaxOrderUser/{id}', 'ShopController@ajaxOrderUser');
+Route::get('/AjaxGetOrderStatus/{id}', 'ShopController@AjaxGetOrderStatus');
+Route::get('/AjaxChangGetOrderStatus/{id}', 'ShopController@AjaxChangGetOrderStatus');
+Route::get('/AjaxChangGetOrderStatusY/{id}', 'ShopController@AjaxChangGetOrderStatusY');
 
-
+Route::get('/AjaxGetOrderStatusUser/{id}', 'ShopController@AjaxGetOrderStatusUser');
+Route::get('/AjaxChangGetOrderStatusUser/{id}', 'ShopController@AjaxChangGetOrderStatusUser');
+Route::get('/AjaxChangGetOrderStatusUserY/{id}', 'ShopController@AjaxChangGetOrderStatusUserY');
 
 
 

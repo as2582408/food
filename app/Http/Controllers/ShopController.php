@@ -405,6 +405,77 @@ class ShopController extends Controller
         return view('detailOrderAdminList', ['orders' => $newOrder, 'products' => $newProduct, 'id' => $id,'shopID' => $shopid->shop_id, 'shopName' => $shop]);
     }
 
+    public function detailOrderAdminListPay($id) 
+    {
+        if (!is_numeric($id)) {
+            return redirect('/');
+        }
+        if (!Session::has('edit'.$id))
+        {
+            return redirect('/')->withErrors('認證過期，請重新登入');;
+        }
+        $orders = DB::select('SELECT product_name,user,SUM(amount) as amount,product_price,order_id FROM `order` WHERE detail_id = ? GROUP BY product_name,user,product_price,order_id
+        ',[$id]);
+        $shopid = Detail::find($id);
+        $shop = Shop::find($shopid->shop_id);
+        $product = Product::where('shop_id',$shopid->shop_id)->get();
+        $newOrder = [];
+        //將訂單依商品分類
+        foreach($orders as $order)
+        {
+            $key = $order->product_name;
+            $newOrder[$key][] = $order;
+        }
+        //商品價格
+        $newProduct = [];
+        foreach($product as $products)
+        {
+            $key = $products->product_name;
+            $newProduct[$key][] = $products;
+        }
+        return view('detailOrderAdminListPay', ['orders' => $newOrder, 'products' => $newProduct, 'id' => $id,'shopID' => $shopid->shop_id, 'shopName' => $shop]);
+    }
+    public function detailOrderUserAdminPay($id) 
+    {
+        if(!is_numeric($id)) {
+            return redirect('/');
+        }
+        if (!Session::has('edit'.$id))
+        {
+            return redirect('/')->withErrors('認證過期，請重新登入');;
+        }
+        $shopID = Detail::find($id);
+        $shop = Shop::find($shopID->shop_id);
+
+        $users = DB::select('SELECT user,product_name,SUM(amount) as amount, (product_price * SUM(amount)) as total, order_id FROM `order` WHERE detail_id = ? GROUP BY user,product_name,product_price,order_id',[$id]);
+        $newUser = [];
+        $price = [];
+        $total = 0;
+        //依造使用者分類
+        foreach($users as $user)
+        {
+            $key = $user->user;
+            $newUser[$key][] = $user;
+        } 
+        //計算總金額
+        $key = '';
+        foreach($users as $user)
+        {
+            if($key == '') $key = $user->user;
+
+            if($user->user == $key) {
+                $total += $user->total;
+            } else {
+                $key = $user->user;
+                $total = $user->total;
+            }
+            $price[$key] = $total;
+
+        }
+        
+        return view('detailOrderUserAdminPay', ['users' => $newUser, 'id' => $id, 'price' => $price, 'shopID' => $shopID->shop_id, 'shopName' => $shop]);
+
+    } 
     public function editOrder(Request $request) 
     {
         
@@ -631,5 +702,57 @@ class ShopController extends Controller
         $idarr = mb_split('-', $id);
         $ps = DB::select('SELECT ps,amount FROM `order` WHERE user = ? and order_id = ?',[$idarr[0], $idarr[1]]);
         return $ps;
+    }
+
+    public function AjaxGetOrderStatus($id) 
+    {   
+        if (!is_numeric($id)) {
+            return '404';
+        }
+        $orders = DB::select('SELECT product_name,user,SUM(amount) as amount,product_price,order_id FROM `order` WHERE detail_id = ? AND status="Y" GROUP BY product_name,user,product_price,order_id
+        ',[$id]);
+        return $orders;
+    }
+
+    public function AjaxChangGetOrderStatus($id) 
+    {   
+        $idarr = mb_split('-', $id);
+        $re = Order::where([['order_id', $idarr[1]],['user',$idarr[0]]])->update(['status' => 'Y']);
+
+        return $re;
+    }
+
+    public function AjaxChangGetOrderStatusY($id) 
+    {   
+        $idarr = mb_split('-', $id);
+        $re = Order::where([['order_id', $idarr[1]],['user',$idarr[0]]])->update(['status' => 'N']);
+
+        return $re;
+    }
+
+
+    //
+    public function AjaxGetOrderStatusUser($id) 
+    {   
+        if (!is_numeric($id)) {
+            return '404';
+        }
+        $orders = DB::select('SELECT user FROM `order` WHERE detail_id = 6 AND status="Y" GROUP BY user',[$id]);
+        return $orders;
+    }
+    public function AjaxChangGetOrderStatusUser($id) 
+    {   
+        $idarr = mb_split('-', $id);
+        $re = Order::where([['detail_id', $idarr[1]],['user',$idarr[0]]])->update(['status' => 'Y']);
+
+        return $re;
+    }
+
+    public function AjaxChangGetOrderStatusUserY($id) 
+    {   
+        $idarr = mb_split('-', $id);
+        $re = Order::where([['detail_id', $idarr[1]],['user',$idarr[0]]])->update(['status' => 'N']);
+
+        return $re;
     }
 }

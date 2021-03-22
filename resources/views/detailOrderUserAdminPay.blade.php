@@ -46,6 +46,7 @@
             </ol>
         </nav>
     </div>
+
     <table class="table table-sm">
         <thead>
             <div>
@@ -56,100 +57,76 @@
                 </ol>
             </div>
         <tr>
-            <th scope="col">商品名</th>
-            <th scope="col">價格</th>
-            <th scope="col">訂購者</th>
-            <th scope="col">數量</th>
-            <th scope="col">備註</th>
+            <th scope="col">訂購人</th>
+            <th scope="col">總價</th>
+            <th scope="col">商品</th>
         </tr>
         </thead>
         <tbody>
-            @foreach ($orders as  $order)
+            @foreach ($users as $user_name => $products)
             <tr>
-                <th scope="row">{{$order->product_name}}</th>
-                <td id = 'price{{$order->id}}'>{{$order->product_price}}</td>
-                <td id={{$order->id}} onclick="chang('{{$order->id}}')">{{$order->user}}</td>
-                <td id = 'amount{{$order->id}}'>{{$order->amount}}</td>
-                <td>{{$order->ps}}</td>
+                <th scope="row" id="{{$user_name.'-'}}{{$id}}" style='background-color:#00BB00'>{{$user_name}}</th>
+                <th scope="row">{{'$'.$price[$user_name]}}</th>
+
+                @foreach ($products as $product)
+                    <td>{{$product->product_name}}{{' x '.$product->amount}}</td>
+                @endforeach
             </tr>
             @endforeach
-        </tbody>
+    </tbody>
     </table>
-    <table class="table table-sm">
-    <tr>
-        <th>未付款金額</th>
-        <td id = "noPay"></td>
-        <th>已付款金額</th>
-        <td id = "Pay"></td>
-        <th>總計</th>
-        <td id = "total"></td>
-    </tr>
-    </table>
-
 </div>
 <script> 
-        var id = {{$id}}
+    var id = {{$id}}
+    $.ajax({
+        url: "/AjaxGetOrderStatusUser/"+id,
+        type: "GET",
+        dataType: "text",
+        cache: false,
+        success: function(response) {
+            var arr = JSON.parse(response);
+            console.log(arr);
+        var forEachIt = arr.forEach(function(item, index, array){
+            var tdid = item.user+'-'+id;
+            document.getElementById(tdid).style['background-color'] = 'red';
+            document.getElementById(tdid).removeAttribute('onclick');
+            document.getElementById(tdid).setAttribute('onclick','changY("'+tdid+'")')
+        });
+        },
+        error: function(){
+            console.log('哪裡怪怪的');
+            } 
+    });
+
+    function changN(id){
+            console.log(id,status);
         $.ajax({
-            url: "/getOrderStatus/"+id,
+            url: "/AjaxChangGetOrderStatusUser/"+id,
             type: "GET",
             dataType: "text",
             cache: false,
             success: function(response) {
-                var arr = JSON.parse(response);
-                var noPay = 0;
-                var Pay = 0;
-                var forEachIt = arr.forEach(function(item, index, array){
-                    if(item.status == 'Y') {
-                        var color = 'red';
-                    } else {
-                        var color = '#00BB00';
-                    }
-                    if(item.status == 'Y') {
-                        noPay += (item.product_price * item.amount);
-                    } else {
-                        Pay += (item.product_price * item.amount);
-                    }
-                    document.getElementById(item.id).style['background-color'] = color;
-                });
-                document.getElementById('noPay').innerHTML = noPay;
-                document.getElementById('Pay').innerHTML = Pay;
-                document.getElementById('total').innerHTML = parseInt(Pay) + parseInt(noPay);
+                    document.getElementById(id).style['background-color'] = 'red';
+                    document.getElementById(id).removeAttribute('onclick');
+                    document.getElementById(id).setAttribute('onclick','changY("'+id+'")')
             },
             error: function(){
                 console.log('哪裡怪怪的');
         	    } 
-        });
+            });
+    }
 
-        function chang(id){
-            var oldNoPay = document.getElementById('noPay').innerHTML
-            var oldPay = document.getElementById('Pay').innerHTML
-            var price =  document.getElementById('price'+id).innerHTML
-            var amount =  document.getElementById('amount'+id).innerHTML
+    function changY(id){
+            console.log(id,status);
         $.ajax({
-            url: "/changOrderStatus/"+id,
+            url: "/AjaxChangGetOrderStatusUserY/"+id,
             type: "GET",
             dataType: "text",
             cache: false,
             success: function(response) {
-                console.log(response);
-                if(response == 'N') {
-                        var color = '#00BB00';
-                    } else {
-                        var color = 'red';
-                }
-                document.getElementById(id).style['background-color'] = color;
-                if(response == 'N') {
-                        oldNoPay = (oldNoPay - (price * amount));
-                        oldPay = parseInt(oldPay) + parseInt(price * amount);
-                        document.getElementById('noPay').innerHTML = oldNoPay;
-                        document.getElementById('Pay').innerHTML = oldPay;
-                } 
-                if (response == 'Y') {
-                        oldNoPay = parseInt(oldNoPay) + parseInt(price * amount);
-                        oldPay = (oldPay - (price * amount));
-                        document.getElementById('noPay').innerHTML = oldNoPay;
-                        document.getElementById('Pay').innerHTML = oldPay;
-                }
+                    document.getElementById(id).style['background-color'] = '#00BB00';
+                    document.getElementById(id).removeAttribute('onclick');
+                    document.getElementById(id).setAttribute('onclick','changN("'+id+'")')
             },
             error: function(){
                 console.log('哪裡怪怪的');
