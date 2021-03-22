@@ -60,7 +60,7 @@
         <tr>
             <th scope="col">商品名</th>
             <th scope="col">單價</th>
-            <th scope="col">總計</th>
+            <th scope="col">小計</th>
             <th scope="col">訂購者</th>
             <th scope="col">數量</th>
             <th scope="col">備註</th>

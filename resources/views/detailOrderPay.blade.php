@@ -58,6 +58,7 @@
         <tr>
             <th scope="col">商品名</th>
             <th scope="col">價格</th>
+            <th scope="col">小計</th>
             <th scope="col">訂購者</th>
             <th scope="col">數量</th>
             <th scope="col">備註</th>
@@ -68,6 +69,7 @@
             <tr>
                 <th scope="row">{{$order->product_name}}</th>
                 <td id = 'price{{$order->id}}'>{{$order->product_price}}</td>
+                <td>{{$order->product_price * $order->amount}}</td>
                 <td id={{$order->id}} onclick="chang('{{$order->id}}')">{{$order->user}}</td>
                 <td id = 'amount{{$order->id}}'>{{$order->amount}}</td>
                 <td>{{$order->ps}}</td>

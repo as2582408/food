@@ -12,18 +12,8 @@
 <body>
 <hr>
     <div class="container">
-      @if (count($errors) > 0)
-                <div class="alert alert-danger">
-                    @foreach ($errors->all() as $errors)
-                        <p>{{ $errors }}</p>    
-                    @endforeach
-                </div>
-
-                @elseif (isset($success))
-                <div class="alert alert-success">
-                        <p>{{ $success }}</p>    
-                </div>
-                @endif 
+                <p id='error'>
+                </p>
     <div class="row">
         <div class="col-md-6 h-100">
             <nav aria-label="breadcrumb">
@@ -35,7 +25,7 @@
             </nav>
         </div>
     </div>
-    <form method="POST" action="{{ url('add') }}" class="form-horizontal" role="form">
+    <form method="POST" class="form-horizontal" role="form" id= 'form'>
 
     <table>
           <tr>
@@ -87,5 +77,26 @@
 		$items.remove();
     i--
 	})
+
+  $('#add').click(function(){
+    data = $('#form').serialize();
+
+    $.ajax({
+        url: "/test",
+        type: "POST",
+        data: data,
+        cache: false,
+        success: function(response) {
+          if( response == '200') {
+            window.location.href="{{ url('shop') }}"
+          }
+          document.getElementById('error').innerHTML = '<div id="error" class="alert alert-danger">'+'<p>'+response+'</p></div>';
+        },
+        error: function(){
+            console.log('哪裡怪怪的');
+            } 
+    });
+    return false;
+  })
 </script>
 

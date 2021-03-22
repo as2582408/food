@@ -65,7 +65,7 @@
         <tbody>
             @foreach ($users as $user_name => $products)
             <tr>
-                <th scope="row" id="{{$user_name.'-'}}{{$id}}" style='background-color:#00BB00'>{{$user_name}}</th>
+                <th scope="row" id="{{$user_name.'-'}}{{$id}}" style='background-color:#00BB00' onclick="changN('{{$user_name.'-'}}{{$id}}')">{{$user_name}}</th>
                 <th scope="row">{{'$'.$price[$user_name]}}</th>
 
                 @foreach ($products as $product)

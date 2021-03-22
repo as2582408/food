@@ -136,60 +136,6 @@ class ShopController extends Controller
         return view('order',['products' => $products, 'detailId' => $id, 'shopName' => $shop, 'adcheck' => $admin]);
     }
 
-    public function addOrder(Request $request) 
-    {
-        $products = Product::select('product.id','product.product_name','product.product_price')        
-        ->join('detail', 'product.shop_id', '=', 'detail.shop_id')
-        ->get();
-        if($request->adcheck == 'admin'){
-            $url = 'detailOrderAdmin/'.$request->id;
-        } else {
-            $url = '/';
-        }
-        foreach($products as $product) {
-            //彈性變數
-            $amount = 'amount'.$product->id;
-            $ps = 'ps'.$product->id;
-
-            $itemPattern = "/^[A-Za-z0-9\x7f-\xffA]+$/";
-            $this->validate($request, [
-                'name' => 'required|max:30|regex:/^[A-Za-z0-9\x7f-\xffA]+$/',
-            ]);
-
-            if(isset($request->$ps) && !preg_match($itemPattern, $request->$ps, $matches)) {
-                $this->validate($request, [
-                    $ps => 'max:30|regex:/^[A-Za-z0-9\x7f-\xffA]+$/',
-                ], [
-                    $ps.'.max' => '請勿輸入過長備註',
-                    $ps.'.regex' => '備註格式錯誤，請勿輸入特殊符號'
-                ]);
-            }
-            if(isset($request->$amount)) {
-                $this->validate($request, [
-                    $amount => 'numeric|min:1'
-                ], [
-                    $amount.'.numeric' => '數目格式錯誤，請輸入數字',
-                    $amount.'.min' => '數目錯誤，請大於一'
-                ]);
-            }
-            //如果商品存在數量才進行動作
-            if($request->$amount > 0) {
-                    $Pss = (isset($request->$ps)) ? $request->$ps : '';
-                    Order::create([
-                        'detail_id' => $request->id,
-                        'order_id' => $product->id,
-                        'user' => $request->name,
-                        'amount' => $request->$amount,
-                        'status' => 'Y',
-                        'ps' => $Pss,
-                        'product_name' => $product->product_name,
-                        'product_price' => $product->product_price,
-                    ])->save();
-            }
-        }
-        return redirect($url);
-    }
-
     public function detailOrder($id) 
     {
         if( !is_numeric($id)) {
@@ -755,4 +701,60 @@ class ShopController extends Controller
 
         return $re;
     }
+
+    public function test(Request $request) 
+    {
+        $itemsNum = count($request->items);
+        $priceNum = count($request->price);
+        $price = $request->price;
+
+        if($itemsNum != $priceNum){
+            return '參數錯誤，請勿留白';
+        };
+        //檢查商品
+        $itemPattern = "/^[A-Za-z0-9\x7f-\xffA]+$/";
+        $i = $itemsNum;
+        $j = 1;
+        if(!isset($request->shop) || !preg_match($itemPattern, $request->shop, $matches)){
+            return '商店格式錯誤，請勿輸入特殊符號';
+        }
+        if(!isset($request->addUser) || !preg_match($itemPattern, $request->addUser, $matches)){
+            return '人員格式錯誤，請勿輸入特殊符號';
+        }
+        foreach($request->items as $item) {
+            if(!isset($item)) {
+                return '商品格式錯誤，請勿留白';
+            }
+            if(!preg_match($itemPattern, $item, $matches)){
+                return '商品格式錯誤，請勿輸入特殊符號';
+            }
+            if($j != $i && $request->items[$j] == $item){
+                return '請勿輸入重複商品';
+            }
+            $j++;
+        }
+        //檢查價格
+        foreach($request->price as $priceCheck) {
+            if(!isset($item) || !is_numeric($priceCheck)){
+                return '價格格式錯誤，請輸入數字';
+            }
+        }
+        $check = Shop::where('shop_name', $request->shop)->first();
+        if (isset($check)) {
+            return '商店已存在';
+        }
+
+        $shopId = Shop::insertGetId(['shop_name' => $request->shop, 'add_user' => $request->addUser]);
+
+        foreach($request->items as $key => $item)
+        {
+            Product::create([
+                'shop_id' => $shopId,
+                'product_name' => $item,
+                'product_price' => $price[$key],
+                'product_status' => 'Y'
+            ])->save();
+        }
+        return '200';
+        }
 }

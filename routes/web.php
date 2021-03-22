@@ -78,5 +78,6 @@ Route::get('/AjaxChangGetOrderStatusUser/{id}', 'ShopController@AjaxChangGetOrde
 Route::get('/AjaxChangGetOrderStatusUserY/{id}', 'ShopController@AjaxChangGetOrderStatusUserY');
 
 
+Route::post('/test', 'ShopController@test');
 
 
